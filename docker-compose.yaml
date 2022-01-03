@@ -49,9 +49,9 @@ x-airflow-common:
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://callcenter_etl_admin:jw8s0F4@localhost/callcenter_etl
-    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://callcenter_etl_admin:jw8s0F4@localhost/callcenter_etl
-    AIRFLOW__CELERY__BROKER_URL: redis://:@localhost:6379/0
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://callcenter_etl_admin:jw8s0F4@host.docker.internal:5432/callcenter_etl
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://callcenter_etl_admin:jw8s0F4@host.docker.internal:5432/callcenter_etl
+    AIRFLOW__CELERY__BROKER_URL: redis://:@host.docker.internal:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
