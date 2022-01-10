@@ -101,7 +101,7 @@ services:
 
   airflow-webserver:
     <<: *airflow-common
-    command: webserver
+    command: airflow webserver
     ports:
       - 8080:8080
     healthcheck:
@@ -116,7 +116,7 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
-    command: scheduler
+    command: airflow scheduler
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
       interval: 10s
@@ -129,7 +129,7 @@ services:
 
   airflow-triggerer:
     <<: *airflow-common
-    command: triggerer
+    command: airflow triggerer
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
       interval: 10s
