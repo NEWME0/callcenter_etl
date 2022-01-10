@@ -1,74 +1,32 @@
-# from datetime import datetime
-#
-# from airflow import DAG
-# from airflow.models.baseoperator import chain
-# from airflow.models.variable import Variable
-# from airflow.operators.dummy import DummyOperator
-#
-#
-# dag_defaults = {
-#     'schedule_interval': None,
-#     'start_date': datetime(2022, 1, 1),
-#     'catchup': False,
-#     'tags': ['external']
-# }
-#
-#
-# # def create_dag(conn_id: str, **kwargs) -> DAG:
-# #     # Generate name for dag
-# #     dag_id = f'ext_workflow_{conn_id}'
-# #
-# #     # Combine kwargs for dag
-# #     dag_kwargs = dag_defaults.copy()
-# #     dag_kwargs.update(kwargs)
-# #
-# #     # Create dag
-# #     dag = DAG(dag_id, **dag_kwargs)
-# #
-# #     # Setup dag tasks
-# #     task_scan_recordings = DummyOperator(task_id='task_scan_recordings', dag=dag)
-# #     task_process_recordings = DummyOperator(task_id='task_process_recordings', dag=dag)
-# #     task_download_recordings = DummyOperator(task_id='task_download_recordings', dag=dag)
-# #     task_convert_recordings = DummyOperator(task_id='task_convert_recordings', dag=dag)
-# #     task_export_recordings = DummyOperator(task_id='task_export_recordings', dag=dag)
-# #
-# #     # Setup tasks order
-# #     chain(
-# #         task_scan_recordings,
-# #         task_process_recordings,
-# #         task_download_recordings,
-# #         task_convert_recordings,
-# #         task_export_recordings
-# #     )
-# #
-# #     return dag
-# #
-# #
-# # # Get connections to be processed as external
-# # ext_conn_ids = Variable.get('ext_conn_ids', default_var={}, deserialize_json=True)
-# #
-# #
-# # # Create dag for each connection in EXT_CONN_IDS and append it to globals
-# # for connection_id, connection_dag_kwargs in ext_conn_ids.items():
-# #     connection_dag = create_dag(connection_id, **connection_dag_kwargs)
-# #     globals()[connection_dag.dag_id] = connection_dag
-#
-#
-# with DAG('conn_id', **dag_defaults) as dag:
-#     ext_conn_ids = Variable.get('ext_conn_ids', default_var={}, deserialize_json=True)
-#
-#     print(ext_conn_ids)
-#
-#     task_scan_recordings = DummyOperator(task_id='task_scan_recordings')
-#     task_process_recordings = DummyOperator(task_id='task_process_recordings')
-#     task_download_recordings = DummyOperator(task_id='task_download_recordings')
-#     task_convert_recordings = DummyOperator(task_id='task_convert_recordings')
-#     task_export_recordings = DummyOperator(task_id='task_export_recordings')
-#
-#     chain(
-#         task_scan_recordings,
-#         task_process_recordings,
-#         task_download_recordings,
-#         task_convert_recordings,
-#         task_export_recordings
-#     )
+from datetime import datetime, timedelta
+
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from airflow.operators.dummy import DummyOperator
+
+
+with DAG(
+    dag_id='manually_created_dag',
+    schedule_interval='0 0 * * *',
+    start_date=datetime(2021, 1, 1),
+    catchup=False,
+    dagrun_timeout=timedelta(minutes=60),
+    tags=['example', 'example2'],
+    params={"example_key": "example_value"},
+) as dag:
+    run_this_last = DummyOperator(task_id='run_this_last')
+
+    run_this = BashOperator(task_id='run_after_loop',bash_command='echo 1',)
+
+    run_this >> run_this_last
+
+    for i in range(3):
+        task = BashOperator(task_id='runme_' + str(i), bash_command='echo "{{ task_instance_key_str }}" && sleep 1')
+        task >> run_this
+
+    also_run_this = BashOperator(task_id='also_run_this', bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run }}"',)
+    also_run_this >> run_this_last
+
+
+if __name__ == "__main__":
+    dag.cli()
