@@ -6,13 +6,12 @@ from airflow.models.variable import Variable
 from airflow.operators.dummy import DummyOperator
 
 
-dag_defaults = dict(
-    shedule_interval=None,
-    start_date=datetime(2022, 1, 1),
-    end_date=None,
-    catchup=False,
-    tags=['external']
-)
+dag_defaults = {
+    'schedule_interval': None,
+    'start_date': datetime(2022, 1, 1),
+    'catchup': False,
+    'tags': ['external']
+}
 
 
 def create_dag(conn_id: str, **kwargs) -> DAG:
@@ -27,20 +26,20 @@ def create_dag(conn_id: str, **kwargs) -> DAG:
     dag = DAG(dag_id, **dag_kwargs)
 
     # Setup dag tasks
-    with dag:
-        task_scan_recordings = DummyOperator(task_id='task_scan_recordings', dag=dag)
-        task_process_recordings = DummyOperator(task_id='task_process_recordings', dag=dag)
-        task_download_recordings = DummyOperator(task_id='task_download_recordings', dag=dag)
-        task_convert_recordings = DummyOperator(task_id='task_convert_recordings', dag=dag)
-        task_export_recordings = DummyOperator(task_id='task_export_recordings', dag=dag)
+    task_scan_recordings = DummyOperator(task_id='task_scan_recordings', dag=dag)
+    task_process_recordings = DummyOperator(task_id='task_process_recordings', dag=dag)
+    task_download_recordings = DummyOperator(task_id='task_download_recordings', dag=dag)
+    task_convert_recordings = DummyOperator(task_id='task_convert_recordings', dag=dag)
+    task_export_recordings = DummyOperator(task_id='task_export_recordings', dag=dag)
 
-        chain(
-            task_scan_recordings,
-            task_process_recordings,
-            task_download_recordings,
-            task_convert_recordings,
-            task_export_recordings
-        )
+    # Setup tasks order
+    chain(
+        task_scan_recordings,
+        task_process_recordings,
+        task_download_recordings,
+        task_convert_recordings,
+        task_export_recordings
+    )
 
     return dag
 
