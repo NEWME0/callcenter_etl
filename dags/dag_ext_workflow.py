@@ -16,8 +16,7 @@ with DAG(
 ) as dag:
     run_this_last = DummyOperator(task_id='run_this_last')
 
-    run_this = BashOperator(task_id='run_after_loop',bash_command='echo 1',)
-
+    run_this = BashOperator(task_id='run_after_loop', bash_command='echo 1',)
     run_this >> run_this_last
 
     for i in range(3):
