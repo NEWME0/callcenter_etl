@@ -40,6 +40,6 @@ def create_dag_ext_workflow(conn_id: str, **kwargs):
 ext_connections = Variable.get('ext_connections', default_var={}, deserialize_json=True)
 
 
-for connection_id, dag_kwargs in ext_connections.items():
-    new_dag = create_dag_ext_workflow(connection_id, **dag_kwargs)
+for connection_id, dag_settings in ext_connections.items():
+    new_dag = create_dag_ext_workflow(connection_id, **dag_settings)
     globals()[new_dag.dag_id] = new_dag
