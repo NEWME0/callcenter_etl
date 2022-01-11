@@ -1,31 +1,45 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.bash import BashOperator
+from airflow.models import Variable
+from airflow.models.baseoperator import chain
 from airflow.operators.dummy import DummyOperator
 
 
-with DAG(
-    dag_id='manually_created_dag',
-    schedule_interval='0 0 * * *',
-    start_date=datetime(2021, 1, 1),
-    catchup=False,
-    dagrun_timeout=timedelta(minutes=60),
-    tags=['example', 'example2'],
-    params={"example_key": "example_value"},
-) as dag:
-    run_this_last = DummyOperator(task_id='run_this_last')
-
-    run_this = BashOperator(task_id='run_after_loop', bash_command='echo 1',)
-    run_this >> run_this_last
-
-    for i in range(3):
-        task = BashOperator(task_id='runme_' + str(i), bash_command='echo "{{ task_instance_key_str }}" && sleep 1')
-        task >> run_this
-
-    also_run_this = BashOperator(task_id='also_run_this', bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run }}"',)
-    also_run_this >> run_this_last
+dag_defaults = {
+    'schedule_interval': '0 1 * * *',
+    'start_date': datetime(2022, 1, 1),
+    'catchup': False,
+    'tags': ['external']
+}
 
 
-if __name__ == "__main__":
-    dag.cli()
+def create_dag_ext_workflow(conn_id: str, **kwargs):
+    # generate dag name
+    dag_id = f'ext_workflow_{conn_id}'
+
+    # collect dag kwargs
+    dag_kwargs = dag_defaults.copy()
+    dag_kwargs.update(kwargs)
+
+    # create dag
+    dag = DAG(dag_id, **dag_kwargs)
+
+    # setup dag tasks
+    chain(
+        DummyOperator(dag=dag, task_id='ext_scan_recordings'),
+        DummyOperator(dag=dag, task_id='ext_process_recordings'),
+        DummyOperator(dag=dag, task_id='ext_download_recordings'),
+        DummyOperator(dag=dag, task_id='ext_convert_recordings'),
+        DummyOperator(dag=dag, task_id='ext_export_recordings'),
+    )
+
+    return dag
+
+
+ext_connections = Variable.get('ext_connections', default_var={}, deserialize_json=True)
+
+
+for connection_id, dag_settings in ext_connections.items():
+    new_dag = create_dag_ext_workflow(connection_id, **dag_settings)
+    globals()[new_dag.dag_id] = new_dag
