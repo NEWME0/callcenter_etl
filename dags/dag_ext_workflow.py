@@ -19,31 +19,26 @@ dag_defaults = {
 def ext_scan_recordings(*args, **kwargs):
     sleep(3)
     print(args, kwargs)
-    return args, kwargs
 
 
 def ext_process_recordings(*args, **kwargs):
     sleep(3)
     print(args, kwargs)
-    return args, kwargs
 
 
 def ext_download_recordings(*args, **kwargs):
     sleep(3)
     print(args, kwargs)
-    return args, kwargs
 
 
 def ext_convert_recordings(*args, **kwargs):
     sleep(3)
     print(args, kwargs)
-    return args, kwargs
 
 
 def ext_export_recordings(*args, **kwargs):
     sleep(3)
     print(args, kwargs)
-    return args, kwargs
 
 
 def create_dag_ext_workflow(conn_id: str, **kwargs):
