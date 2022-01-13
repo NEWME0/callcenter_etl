@@ -6,6 +6,8 @@ from airflow.models import Variable
 from airflow.models.baseoperator import chain
 from airflow.operators.python import PythonOperator
 
+from apps.external.tasks import ext_scan_recordings
+
 
 # default dag settings
 dag_defaults = {
@@ -14,11 +16,6 @@ dag_defaults = {
     'catchup': False,
     'tags': ['external']
 }
-
-
-def ext_scan_recordings(*args, **kwargs):
-    sleep(3)
-    print(args, kwargs)
 
 
 def ext_process_recordings(*args, **kwargs):
@@ -41,16 +38,12 @@ def ext_export_recordings(*args, **kwargs):
     print(args, kwargs)
 
 
-def create_dag_ext_workflow(conn_id: str, **kwargs):
+def create_dag_external(pbx_id: str, **kwargs):
     # generate dag name
-    dag_id = f'ext_workflow_{conn_id}'
-
-    # collect dag kwargs
-    dag_kwargs = dag_defaults.copy()
-    dag_kwargs.update(kwargs)
+    dag_id = f'external_{pbx_id}'
 
     # create dag
-    dag = DAG(dag_id, **dag_kwargs)
+    dag = DAG(dag_id, default_args=dag_defaults, **kwargs)
 
     # setup dag tasks
     chain(
@@ -89,9 +82,9 @@ def create_dag_ext_workflow(conn_id: str, **kwargs):
     return dag
 
 
-ext_connections = Variable.get('ext_connections', default_var={}, deserialize_json=True)
+external_pbx = Variable.get('external_pbx', default_var={}, deserialize_json=True)
 
 
-for connection_id, dag_settings in ext_connections.items():
-    new_dag = create_dag_ext_workflow(connection_id, **dag_settings)
-    globals()[new_dag.dag_id] = new_dag
+for pbx_key, dag_settings in external_pbx.items():
+    pbx_dag = create_dag_external(pbx_key, **dag_settings)
+    globals()[pbx_dag.dag_id] = pbx_dag
