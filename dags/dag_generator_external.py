@@ -31,11 +31,11 @@ def create_dag_external(pbx_id: str, **kwargs):
 
     # setup dag tasks
     chain(
-        ScanOperator(dag=dag, provide_context=True, task_id='external_scan_recordings'),
-        ParseOperator(dag=dag, provide_context=True, task_id='external_parse_recordings'),
-        DownloadOperator(dag=dag, provide_context=True, task_id='external_download_recordings'),
-        ConvertOperator(dag=dag, provide_context=True, task_id='external_convert_recordings'),
-        ExportOperator(dag=dag, provide_context=True, task_id='external_export_recordings')
+        ScanOperator(dag=dag, task_id='external_scan_recordings'),
+        ParseOperator(dag=dag, task_id='external_parse_recordings'),
+        DownloadOperator(dag=dag, task_id='external_download_recordings'),
+        ConvertOperator(dag=dag, task_id='external_convert_recordings'),
+        ExportOperator(dag=dag, task_id='external_export_recordings')
     )
 
     return dag
