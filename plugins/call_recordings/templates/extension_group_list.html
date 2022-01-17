@@ -1,1 +1,6 @@
-{{ custom_message }}
+{% block content %}
+  {% if can_create_variable() %}
+  <div class="clearfix"></div>
+  {% endif %}
+  {{ super() }}
+{% endblock %}
