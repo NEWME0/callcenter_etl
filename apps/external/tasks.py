@@ -4,16 +4,15 @@ from typing import List
 from pathlib import Path
 from datetime import datetime
 
-from airflow.hooks.base import BaseHook
 from airflow.models import Variable
+from airflow.hooks.base import BaseHook
 from airflow.providers.ftp.hooks.ftp import FTPHook
-from airflow.providers.sqlite.hooks.sqlite import SqliteHook
-
-from apps.external.models import Recording
-from utils.functional import partition
 
 
 def ext_scan_recordings(**context):
+    from apps.external.models import Recording
+    from utils.functional import partition
+
     # get params from context
     params = context.get('params', {})
     pbx_id = params.get('pbx_id')
