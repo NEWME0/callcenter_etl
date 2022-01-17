@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.engine import create_engine, Engine
@@ -30,13 +31,13 @@ class State(str, Enum):
 
 
 class Recording(Base):
-    # base
+    # base columns
     hash = Column(String(length=32), nullable=False)
     pbx_id = Column(String(length=250), nullable=False)
     scan_date = Column(Date, nullable=False)
     source_path = Column(Text, nullable=False)
 
-    # process
+    # parse columns
     call_date = Column(DateTime, nullable=True)
     unique_id = Column(String(length=40), nullable=True)
 
