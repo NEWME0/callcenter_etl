@@ -1,6 +1,5 @@
 
 
-
 def partition(predicate, values):
     """
     Split the values into two sets, based on the return value of the function
