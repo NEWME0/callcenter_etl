@@ -9,7 +9,7 @@ from airflow.models import BaseOperator, Variable
 from airflow.providers.ftp.hooks.ftp import FTPHook
 
 from callcenter.utils.functional import partition
-from callcenter.external.models import Recording
+from callcenter.models.external import Recording
 
 
 class ScanOperator(BaseOperator):

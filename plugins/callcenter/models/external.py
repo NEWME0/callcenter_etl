@@ -11,7 +11,7 @@ Base = declarative_base(cls=DeferredReflection)
 
 
 class State(str, Enum):
-    to_process = 'to_process'
+    to_parse = 'to_parse'
     to_download = 'to_download'
     to_convert = 'to_convert'
     to_export = 'to_export'
@@ -25,7 +25,7 @@ class State(str, Enum):
     ignored = 'ignored'
 
     @classmethod
-    def values(cls):
+    def values(cls) -> List[str]:
         return tuple([element.value for element in cls])  # noqa
 
 
@@ -44,7 +44,7 @@ class Recording(Base):
     target_path = Column(Text, nullable=True)
 
     # finite state machine
-    state = Column(String(length=40), nullable=False, default=State.to_process.value)
+    state = Column(String(length=40), nullable=False, default=State.to_parse.value)
     comment = Column(Text, nullable=True)
 
     __tablename__ = 'external_recording'

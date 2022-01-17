@@ -1,13 +1,10 @@
 from sqlalchemy import Column, String, Integer
-from sqlalchemy.ext.declarative import declarative_base
 
-
-Base = declarative_base()
+from callcenter.models.base import Base
 
 
 class ExtensionGroup(Base):
-    __tablename__ = 'extension_group'
-
+    # columns
     id = Column(Integer, primary_key=True, autoincrement=True)
     pbx_id = Column(String(length=250))
     span = Column(String())
@@ -17,11 +14,16 @@ class ExtensionGroup(Base):
     origin = Column(String())
     group_of_extension = Column(String())
 
+    # meta
+    __tablename__ = 'extension_group'
+
 
 class ExtensionAgent(Base):
-    __tablename__ = 'extension_agent'
-
+    # columns
     id = Column(Integer, primary_key=True, autoincrement=True)
     pbx_id = Column(String(length=250))
     fullname = Column(String(length=80))
     extension = Column(String(length=20))
+
+    # meta
+    __tablename__ = 'extension_agent'
