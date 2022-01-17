@@ -7,7 +7,7 @@ class ExtensionAgentView(BaseView):
     @expose('/')
     def list(self):
         return self.render_template(
-            template="callcenter/templates/extension_agent.html",
+            template="extension_agent_list.html",
             custom_message="Hello from extension agent"
         )
 
@@ -18,6 +18,6 @@ class ExtensionGroupView(BaseView):
     @expose('/')
     def list(self):
         return self.render_template(
-            template="callcenter/templates/extension_group.html",
+            template="extension_group_list.html",
             custom_message="Hello from extension group"
         )

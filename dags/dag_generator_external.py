@@ -4,7 +4,7 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.models.baseoperator import chain
 
-from callcenter.operators.external import (
+from call_recordings.operators.external import (
     ScanOperator,
     ParseOperator,
     DownloadOperator,
