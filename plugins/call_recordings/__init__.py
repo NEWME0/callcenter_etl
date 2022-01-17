@@ -1,7 +1,8 @@
+from flask import Blueprint
 from airflow.plugins_manager import AirflowPlugin
 
-from callcenter.views.common import ExtensionAgentView, ExtensionGroupView
-from callcenter.operators.external import (
+from call_recordings.views.common import ExtensionAgentView, ExtensionGroupView
+from call_recordings.operators.external import (
     ScanOperator,
     ParseOperator,
     DownloadOperator,
@@ -13,8 +14,18 @@ from callcenter.operators.external import (
 menu_category = 'CallRecordings'
 
 
-class CallCenterPlugin(AirflowPlugin):
-    name = 'CallCenterPlugin'
+# Creating a flask blueprint to integrate the templates and static folder
+call_recordings_blueprint = Blueprint(
+    "call_recordings",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    static_url_path="/static/call_recordings",
+)
+
+
+class CallRecordingsPlugin(AirflowPlugin):
+    name = 'CallRecordingsPlugin'
     operators = [
         ScanOperator,
         ParseOperator,
@@ -26,7 +37,9 @@ class CallCenterPlugin(AirflowPlugin):
     executors = []
     macros = []
     admin_views = []
-    flask_blueprints = []
+    flask_blueprints = [
+        call_recordings_blueprint
+    ]
     menu_links = []
     appbuilder_views = [
         {

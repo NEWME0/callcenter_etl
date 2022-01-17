@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Integer
 
-from callcenter.models.base import Base
+from call_recordings.models.base import Base
 
 
 class ExtensionGroup(Base):
