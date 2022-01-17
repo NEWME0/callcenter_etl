@@ -1,6 +1,6 @@
 from airflow.plugins_manager import AirflowPlugin
 
-from plugins.callcenter.external.operators import (
+from callcenter.external.operators import (
     ScanOperator,
     ParseOperator,
     DownloadOperator,
