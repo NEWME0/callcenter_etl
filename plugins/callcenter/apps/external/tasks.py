@@ -10,8 +10,8 @@ from airflow.providers.ftp.hooks.ftp import FTPHook
 
 
 def ext_scan_recordings(**context):
-    from apps.external.models import Recording
-    from utils.functional import partition
+    from plugins.callcenter.utils.functional import partition
+    from plugins.callcenter.apps.external.models import Recording
 
     # get params from context
     params = context.get('params', {})

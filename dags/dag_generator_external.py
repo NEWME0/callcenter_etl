@@ -6,7 +6,7 @@ from airflow.models import Variable
 from airflow.models.baseoperator import chain
 from airflow.operators.python import PythonOperator
 
-from apps.external.tasks import ext_scan_recordings
+from plugins.callcenter.apps.external.tasks import ext_scan_recordings
 
 
 # default dag settings
