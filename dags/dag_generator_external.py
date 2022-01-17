@@ -1,16 +1,20 @@
-from time import sleep
 from datetime import datetime
 
 from airflow import DAG
 from airflow.models import Variable
 from airflow.models.baseoperator import chain
-from airflow.operators.python import PythonOperator
 
-from plugins.callcenter.apps.external.tasks import ext_scan_recordings
+from plugins.callcenter.external.operators import (
+    ScanOperator,
+    ParseOperator,
+    DownloadOperator,
+    ConvertOperator,
+    ExportOperator
+)
 
 
 # default dag settings
-dag_defaults = {
+default_args = {
     'schedule_interval': '0 1 * * *',
     'start_date': datetime(2022, 1, 1),
     'catchup': False,
@@ -18,65 +22,20 @@ dag_defaults = {
 }
 
 
-def ext_process_recordings(*args, **kwargs):
-    sleep(3)
-    print(args, kwargs)
-
-
-def ext_download_recordings(*args, **kwargs):
-    sleep(3)
-    print(args, kwargs)
-
-
-def ext_convert_recordings(*args, **kwargs):
-    sleep(3)
-    print(args, kwargs)
-
-
-def ext_export_recordings(*args, **kwargs):
-    sleep(3)
-    print(args, kwargs)
-
-
 def create_dag_external(pbx_id: str, **kwargs):
     # generate dag name
     dag_id = f'external_{pbx_id}'
 
     # create dag
-    dag = DAG(dag_id, default_args=dag_defaults, **kwargs)
+    dag = DAG(dag_id, default_args=default_args, **kwargs)
 
     # setup dag tasks
     chain(
-        PythonOperator(
-            dag=dag,
-            task_id=ext_scan_recordings.__name__,
-            python_callable=ext_scan_recordings,
-            provide_context=True
-        ),
-        PythonOperator(
-            dag=dag,
-            task_id=ext_process_recordings.__name__,
-            python_callable=ext_process_recordings,
-            provide_context=True
-        ),
-        PythonOperator(
-            dag=dag,
-            task_id=ext_download_recordings.__name__,
-            python_callable=ext_download_recordings,
-            provide_context=True
-        ),
-        PythonOperator(
-            dag=dag,
-            task_id=ext_convert_recordings.__name__,
-            python_callable=ext_convert_recordings,
-            provide_context=True
-        ),
-        PythonOperator(
-            dag=dag,
-            task_id=ext_export_recordings.__name__,
-            python_callable=ext_export_recordings,
-            provide_context=True
-        )
+        ScanOperator(dag=dag, provide_context=True, task_id='external_scan_recordings'),
+        ParseOperator(dag=dag, provide_context=True, task_id='external_parse_recordings'),
+        DownloadOperator(dag=dag, provide_context=True, task_id='external_download_recordings'),
+        ConvertOperator(dag=dag, provide_context=True, task_id='external_convert_recordings'),
+        ExportOperator(dag=dag, provide_context=True, task_id='external_export_recordings')
     )
 
     return dag

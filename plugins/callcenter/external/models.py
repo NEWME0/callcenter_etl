@@ -2,10 +2,8 @@ from enum import Enum
 
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.engine import create_engine, Engine
-from sqlalchemy.orm import Session
-from sqlalchemy.sql.schema import Table, Column, Index, CheckConstraint, PrimaryKeyConstraint
+from sqlalchemy.sql.schema import Column, CheckConstraint, PrimaryKeyConstraint
 from sqlalchemy.sql.sqltypes import Text, Date, DateTime, String
-from sqlalchemy.sql.expression import text
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 
 
@@ -80,5 +78,5 @@ class Recording(Base):
         return engine.execute(statement=statement).fetchall()
 
 
-e = create_engine('postgresql+psycopg2://sandbox:sandbox@10.1.1.174:5432/sandbox_01')
+# e = create_engine('postgresql+psycopg2://sandbox:sandbox@10.1.1.174:5432/sandbox_01')
 # Base.prepare(engine)
