@@ -5,10 +5,9 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.engine import create_engine, Engine
 from sqlalchemy.sql.schema import Column, CheckConstraint, PrimaryKeyConstraint
 from sqlalchemy.sql.sqltypes import Text, Date, DateTime, String
-from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
+from sqlalchemy.ext.declarative import DeferredReflection
 
-
-Base = declarative_base(cls=DeferredReflection)
+from call_recordings.models.base import Base
 
 
 class State(str, Enum):
@@ -30,7 +29,7 @@ class State(str, Enum):
         return tuple([element.value for element in cls])  # noqa
 
 
-class Recording(Base):
+class Recording(DeferredReflection, Base):
     # base columns
     hash = Column(String(length=32), nullable=False)
     pbx_id = Column(String(length=250), nullable=False)
@@ -77,7 +76,3 @@ class Recording(Base):
     def bulk_create(cls, engine: Engine, values: list):
         statement = insert(cls).values(values).on_conflict_do_nothing().returning(cls.hash)
         return engine.execute(statement=statement).fetchall()
-
-
-# e = create_engine('postgresql+psycopg2://sandbox:sandbox@10.1.1.174:5432/sandbox_01')
-# Base.prepare(engine)
