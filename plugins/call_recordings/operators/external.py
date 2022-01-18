@@ -77,6 +77,10 @@ class ScanOperator(BaseOperator):
             } for source_path in audio_items
         ]
 
+        # create partition if doesn't exists
+        Recording.create_partition(pbx_id=pbx_id)
+
+        # bulk insert values
         created_hashes = Recording.bulk_create(target_engine, values=recording_values)
         print(f"Newly created recordings: {created_hashes}")
 
