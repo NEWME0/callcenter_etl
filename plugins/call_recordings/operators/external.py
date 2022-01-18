@@ -4,6 +4,8 @@ from typing import Any, List
 from pathlib import Path
 from datetime import datetime
 
+from sqlalchemy.engine import Engine
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from airflow.hooks.base import BaseHook
 from airflow.models import BaseOperator, Variable
 from airflow.providers.ftp.hooks.ftp import FTPHook
@@ -13,6 +15,17 @@ from call_recordings.models.external import Base, Recording
 
 
 class ScanOperator(BaseOperator):
+    target_model: DeclarativeMeta = Recording
+
+    @classmethod
+    def prepare_database(cls, engine: Engine, pbx_id: str):
+        # bind engine to models
+        cls.target_model.__base__.prepare(engine)
+        # create tables if not exists
+        cls.target_model.__base__.metadata.create_all()
+        # create partition if not exists
+        cls.target_model.create_partition(engine, pbx_id=pbx_id)
+
     def execute(self, context: Any):
         # get params from context
         params = context.get('params', {})
@@ -59,9 +72,6 @@ class ScanOperator(BaseOperator):
         target_conn = BaseHook.get_hook(target_conn_id)
         target_engine = target_conn.get_sqlalchemy_engine()
 
-        # ensure base is has needed tables
-        Base.prepare(target_engine)
-
         # prepare values for insertion
         recording_values = [
             {
@@ -72,11 +82,10 @@ class ScanOperator(BaseOperator):
             } for source_path in audio_items
         ]
 
-        # create partition if doesn't exists
-        Recording.create_partition(target_engine, pbx_id=pbx_id)
+        self.prepare_database(target_engine, pbx_id)
 
         # bulk insert values
-        created_hashes = Recording.bulk_create(target_engine, values=recording_values)
+        created_hashes = self.target_model.bulk_create(target_engine, values=recording_values)
         print(f"Newly created recordings: {created_hashes}")
 
 
