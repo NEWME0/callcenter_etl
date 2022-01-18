@@ -26,6 +26,9 @@ def create_dag_external(pbx_id: str, **kwargs):
     # generate dag name
     dag_id = f'external_{pbx_id}'
 
+    # setup kwargs
+    kwargs.setdefault('max_active_runs', 1)
+
     # create dag
     dag = DAG(dag_id, default_args=default_args, **kwargs)
 
