@@ -62,15 +62,20 @@ class ScanOperator(BaseOperator):
         # ensure base is has needed tables
         Base.prepare(target_engine)
 
+        # prepare values for insertion
         recording_values = [
             {
                 'hash': md5(source_path.encode()).hexdigest(),
                 'pbx_id': pbx_id,
-                'scan_date': scan_date.date,
-                'source_path': source_path
+                'scan_date': scan_date.date(),
+                'source_path': scan_path_object.joinpath(source_path).as_posix()
             } for source_path in audio_items
         ]
 
+        # create partition if doesn't exists
+        Recording.create_partition(pbx_id=pbx_id)
+
+        # bulk insert values
         created_hashes = Recording.bulk_create(target_engine, values=recording_values)
         print(f"Newly created recordings: {created_hashes}")
 
