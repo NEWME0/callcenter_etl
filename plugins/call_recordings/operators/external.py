@@ -9,7 +9,7 @@ from airflow.models import BaseOperator, Variable
 from airflow.providers.ftp.hooks.ftp import FTPHook
 
 from call_recordings.utils.functional import partition
-from call_recordings.models.external import Recording
+from call_recordings.models.external import Base, Recording
 
 
 class ScanOperator(BaseOperator):
@@ -51,13 +51,16 @@ class ScanOperator(BaseOperator):
         is_audio = re.compile(r'^.*\.(?:wav|mp3)$')
 
         # filter only audio formats
-        other_items, audio_items = partition(values=directory_items, predicate=is_audio.match)
+        other_items, audio_items = partition(values=directory_items, predicate=lambda item: bool(is_audio.match(item)))
         print(f"Not audio: {len(other_items)}. Audio: {audio_items}")
 
         # save validated file paths
         target_conn_id = Variable.get('target_conn_id')
         target_conn = BaseHook.get_hook(target_conn_id)
         target_engine = target_conn.get_sqlalchemy_engine()
+
+        # ensure base is has needed tables
+        Base.prepare(target_engine)
 
         recording_values = [
             {
