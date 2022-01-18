@@ -12,11 +12,6 @@ from call_recordings.utils.functional import partition
 from call_recordings.models.external import Base, Recording
 
 
-class RecordingScan(BaseOperator):
-    def execute(self, context: Any):
-        ...
-
-
 class ScanOperator(BaseOperator):
     def execute(self, context: Any):
         # get params from context
