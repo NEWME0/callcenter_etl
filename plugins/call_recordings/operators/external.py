@@ -73,7 +73,7 @@ class ScanOperator(BaseOperator):
         ]
 
         # create partition if doesn't exists
-        Recording.create_partition(pbx_id=pbx_id)
+        Recording.create_partition(target_engine, pbx_id=pbx_id)
 
         # bulk insert values
         created_hashes = Recording.bulk_create(target_engine, values=recording_values)
