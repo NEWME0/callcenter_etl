@@ -12,6 +12,11 @@ from call_recordings.utils.functional import partition
 from call_recordings.models.external import Base, Recording
 
 
+class RecordingScan(BaseOperator):
+    def execute(self, context: Any):
+        ...
+
+
 class ScanOperator(BaseOperator):
     def execute(self, context: Any):
         # get params from context
@@ -62,12 +67,13 @@ class ScanOperator(BaseOperator):
         # ensure base is has needed tables
         Base.prepare(target_engine)
 
+        # prepare values for insertion
         recording_values = [
             {
                 'hash': md5(source_path.encode()).hexdigest(),
                 'pbx_id': pbx_id,
-                'scan_date': scan_date.date,
-                'source_path': source_path
+                'scan_date': scan_date.date(),
+                'source_path': scan_path_object.joinpath(source_path).as_posix()
             } for source_path in audio_items
         ]
 
